@@ -9,6 +9,13 @@
 import Foundation
 import UIKit
 
+public enum TitlePlacement {
+  
+  case header
+  case footer
+  
+}
+
 public class TableViewAdapter<ObjectType>: NSObject, UITableViewDataSource, UITableViewDelegate, UIScrollViewDelegate{
 
   typealias DataSourceType = ObjectsDataSource<ObjectType>
@@ -24,7 +31,7 @@ public class TableViewAdapter<ObjectType>: NSObject, UITableViewDataSource, UITa
   public var userInfoForCellHeightMatching: ((IndexPath) -> [String: AnyObject]) = { _ in return [:] }
   public var userInfoForSectionHeaderHeightMatching: ((Int) -> [String: AnyObject]) = { _ in return [:] }
   public var userInfoForSectionFooterHeightMatching: ((Int) -> [String: AnyObject]) = { _ in return [:] }
-  public var shouldUseTitleInFooter = false
+  public var titlePlacement: TitlePlacement = .header
 
   public let didSelectCell = Pipe<(UITableViewCell, IndexPath, ObjectType)>()
   public let willDisplayCell = Pipe<(UITableViewCell, IndexPath)>()
@@ -229,7 +236,7 @@ public class TableViewAdapter<ObjectType>: NSObject, UITableViewDataSource, UITa
       let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: String(describing: headerClass)) {
       if let titleApplicable = view as? TitleApplicable,
          let sectionTitle = dataSource.titleForSection(atIndex: section),
-         !shouldUseTitleInFooter {
+         titlePlacement == .header {
         titleApplicable.applyTitle(sectionTitle)
       }
 
@@ -271,7 +278,7 @@ public class TableViewAdapter<ObjectType>: NSObject, UITableViewDataSource, UITa
 
       if let titleApplicable = view as? TitleApplicable,
          let sectionTitle = dataSource.titleForSection(atIndex: section),
-         shouldUseTitleInFooter {
+         titlePlacement == .footer {
         titleApplicable.applyTitle(sectionTitle)
       }
 
